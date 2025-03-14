@@ -14,7 +14,7 @@ project/addons/*/bin
 *.dblite
 *.pdb
 *.lib
-bin
+#bin
 *.config
 *.creator
 *.creator.user
