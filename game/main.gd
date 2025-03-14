@@ -31,24 +31,8 @@ func _on_file_dialog_core_file_selected(path):
 	$gd_retro.core_load(path)
 	get_status()
 
-func get_user_data_path() -> String:
-	var base_dir = ""
-	var project_name = ProjectSettings.get_setting("application/config/name")
-	
-	match OS.get_name():
-		"MacOS":
-			base_dir = OS.get_environment("HOME") + "/Library/Application Support/Godot/app_userdata/"
-		"Linux":
-			base_dir = OS.get_environment("HOME") + "/.local/share/godot/app_userdata/"
-		"Windows":
-			base_dir = OS.get_environment("APPDATA") + "/Godot/app_userdata/"
-		_:
-			return ""
-
-	return base_dir + project_name + "/"
-
 func _on_file_dialog_game_file_selected(path: String):
-	var realpath = path.replace("user://", get_user_data_path())
+	var realpath = path.replace("user://", OS.get_user_data_dir() + "/")
 	print("realpath: %s" % realpath)
 	if $gd_retro.core_load_game(realpath):
 		$ui_canvas_layer/ui/buttons_container_left/button_run.disabled = false
