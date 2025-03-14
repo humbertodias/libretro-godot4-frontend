@@ -37,11 +37,11 @@ func get_user_data_path():
 	
 	var user_data_path = ""
 	if OS.get_name() == "MacOS":
-		user_data_path = home_dir + "/Library/Application Support/Godot/app_userdata/" + project_name + "/"
+		user_data_path = "%s/Library/Application Support/Godot/app_userdata/%s/" % [home_dir, project_name]
 	elif OS.get_name() == "Linux":
-		user_data_path = home_dir + "/.local/share/godot/app_userdata/" + project_name + "/"
+		user_data_path = "%s/.local/share/godot/app_userdata/%s/" % [home_dir, project_name]
 	elif OS.get_name() == "Windows":
-		user_data_path = OS.get_environment("APPDATA") + "/Godot/app_userdata/" + project_name + "/"
+		user_data_path = "%s/Godot/app_userdata/%s/" % [OS.get_environment("APPDATA"), project_name]
 	return user_data_path
 
 func _on_file_dialog_game_file_selected(path: String):
