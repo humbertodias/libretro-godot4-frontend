@@ -31,18 +31,21 @@ func _on_file_dialog_core_file_selected(path):
 	$gd_retro.core_load(path)
 	get_status()
 
-func get_user_data_path():
-	var home_dir = OS.get_environment("HOME")
+func get_user_data_path() -> String:
+	var base_dir = ""
 	var project_name = ProjectSettings.get_setting("application/config/name")
 	
-	var user_data_path = ""
-	if OS.get_name() == "MacOS":
-		user_data_path = "%s/Library/Application Support/Godot/app_userdata/%s/" % [home_dir, project_name]
-	elif OS.get_name() == "Linux":
-		user_data_path = "%s/.local/share/godot/app_userdata/%s/" % [home_dir, project_name]
-	elif OS.get_name() == "Windows":
-		user_data_path = "%s/Godot/app_userdata/%s/" % [OS.get_environment("APPDATA"), project_name]
-	return user_data_path
+	match OS.get_name():
+		"MacOS":
+			base_dir = OS.get_environment("HOME") + "/Library/Application Support/Godot/app_userdata/"
+		"Linux":
+			base_dir = OS.get_environment("HOME") + "/.local/share/godot/app_userdata/"
+		"Windows":
+			base_dir = OS.get_environment("APPDATA") + "/Godot/app_userdata/"
+		_:
+			return ""
+
+	return base_dir + project_name + "/"
 
 func _on_file_dialog_game_file_selected(path: String):
 	var realpath = path.replace("user://", get_user_data_path())
