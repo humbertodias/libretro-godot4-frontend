@@ -32,8 +32,11 @@ func _on_file_dialog_core_file_selected(path):
 	get_status()
 
 func _on_file_dialog_game_file_selected(path: String):
+	# MacOS
 	# ~/Library/Application Support/Godot/app_userdata/GDExtensionLibRetro/
-	var realpath = path.replace("user://", "/Users/cex/Downloads/")
+	# Linux
+	# ~/.local/share/godot/app_userdata/libretro-godot4-frontend/
+	var realpath = path.replace("user://", "/home/tux/.local/share/godot/app_userdata/libretro-godot4-frontend/")
 	print("realpath: %s" % realpath)
 	if $gd_retro.core_load_game(realpath):
 		$ui_canvas_layer/ui/buttons_container_left/button_run.disabled = false

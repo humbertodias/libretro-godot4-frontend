@@ -20,7 +20,7 @@ ok_button_text = "Open"
 mode_overrides_title = false
 file_mode = 0
 access = 2
-root_subfolder = "/Users/cex/Downloads"
+root_subfolder = "/usr/lib/libretro"
 filters = PackedStringArray("*_libretro.*")
 
 [node name="file_dialog_game" type="FileDialog" parent="."]
