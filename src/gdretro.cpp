@@ -194,6 +194,7 @@ void GDRetro::_bind_methods()
   ClassDB::bind_method(D_METHOD("set_texture", "texture"), &GDRetro::set_texture);
   ClassDB::bind_method(D_METHOD("get_texture"), &GDRetro::get_texture);
   ClassDB::bind_method(D_METHOD("get_frame_buffer"), &GDRetro::get_frame_buffer);
+  ClassDB::bind_method(D_METHOD("forward_input", "event" ), &GDRetro::forwarded_input );
 
   ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "texture", PROPERTY_HINT_RESOURCE_TYPE, "Texture2D"), "set_texture", "get_texture");
 }

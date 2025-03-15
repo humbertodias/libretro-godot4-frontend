@@ -21,36 +21,6 @@
 #include "gdretro.h"
 
 
-int width = 0;
-int height = 0;
-static struct {
-  void * handle;
-  bool initialized;
-
-  void (*retro_init)(void);
-  void (*retro_deinit)(void);
-  unsigned (*retro_api_version)(void);
-  void (*retro_get_system_info)(struct retro_system_info* info);
-  void (*retro_get_system_av_info)(struct retro_system_av_info* info);
-  void (*retro_set_controller_port_device)(unsigned port, unsigned device);
-  void (*retro_reset)(void);
-  void (*retro_run)(void);
-  // size_t retro_serialize_size(void);
-  // bool retro_serialize(void *data, size_t size);
-  // bool retro_unserialize(const void *data, size_t size);
-  // void retro_cheat_reset(void);
-  // void retro_cheat_set(unsigned index, bool enabled, const char *code);
-  bool (*retro_load_game)(const struct retro_game_info* game);
-  // bool retro_load_game_special(
-  //   unsigned game_type,
-  //   const struct retro_game_info *info,
-  //   size_t num_info);
-  void (*retro_unload_game)(void);
-  // unsigned retro_get_region(void);
-  // void *retro_get_memory_data(unsigned id);
-  // size_t retro_get_memory_size(unsigned id);
-} g_retro;
-
 #define load_sym(V, S) do {\
   if (!((*(void**)&V) = dlsym(g_retro.handle, #S))) /** NOLINT **/ \
     die("[gdretro] Failed to load symbol '" #S "'': %s", dlerror()); \
@@ -72,13 +42,6 @@ static void die(const char * fmt, ...) {
   exit(EXIT_FAILURE);
 }
 
-// static void video_configure(const struct retro_game_geometry * geom) {
-//   width = geom->max_width;
-//   height = geom->max_height;
-//   // MINE
-//   GDRetro::get_singleton()->core_video_init(geom);
-// }
-
 static void video_deinit() {}
 
 static void audio_init(int frequency) {
@@ -92,28 +55,28 @@ static void core_input_poll(void) {
   // Nothing
 }
 
-static int16_t core_input_state(
-      unsigned port,
-      unsigned device,
-      unsigned index,
-      unsigned id) {
-  (void)port;
-  (void)device;
-  (void)index;
-  (void)id;
-  return 0;
-}
+// static int16_t core_input_state(
+//       unsigned port,
+//       unsigned device,
+//       unsigned index,
+//       unsigned id) {
+//   (void)port;
+//   (void)device;
+//   (void)index;
+//   (void)id;
+//   return 0;
+// }
 
-static void core_audio_sample(int16_t left, int16_t right) {
-  (void)left;
-  (void)right;
-}
+// static void core_audio_sample(int16_t left, int16_t right) {
+//   (void)left;
+//   (void)right;
+// }
 
-static size_t core_audio_sample_batch(const int16_t * data, size_t frames) {
-  (void)data;
-  (void)frames;
-  return 0;
-}
+// static size_t core_audio_sample_batch(const int16_t * data, size_t frames) {
+//   (void)data;
+//   (void)frames;
+//   return 0;
+// }
 
 bool core_load(const char * sofile) {
   void (*set_environment)(retro_environment_t) = NULL;
@@ -143,11 +106,13 @@ bool core_load(const char * sofile) {
   load_retro_sym(retro_run);
   load_retro_sym(retro_load_game);
   load_retro_sym(retro_unload_game);
+  // load_retro_sym(retro_keyboard_event_callback);
 
   load_sym(set_environment, retro_set_environment);
   load_sym(set_video_refresh, retro_set_video_refresh);
   load_sym(set_input_poll, retro_set_input_poll);
   load_sym(set_input_state, retro_set_input_state);
+  // load_sym(retro_keyboard_event_callback, retro_keyboard_event_callback);
   load_sym(set_audio_sample, retro_set_audio_sample);
   load_sym(set_audio_sample_batch, retro_set_audio_sample_batch);
 
@@ -157,13 +122,29 @@ bool core_load(const char * sofile) {
   );
 
   set_video_refresh( []( const void *data, unsigned width, unsigned height, size_t pitch ) {
+
     GDRetro::get_singleton()->core_video_refresh( data, width, height, pitch );
   });
 
-  set_input_poll(core_input_poll);
-  set_input_state(core_input_state);
-  set_audio_sample(core_audio_sample);
-  set_audio_sample_batch(core_audio_sample_batch);
+  set_input_poll( []( void ) { GDRetro::get_singleton()->core_input_poll(); } );
+
+  set_input_state( []( unsigned port, unsigned device, unsigned index, unsigned id ) {
+        return GDRetro::get_singleton()->core_input_state( port, device, index, id );
+  } );
+
+  set_audio_sample(
+      []( int16_t left, int16_t right ) { GDRetro::get_singleton()->core_audio_sample( left, right ); } );
+
+  set_audio_sample_batch( []( const int16_t *data, size_t frames ) {
+      return GDRetro::get_singleton()->core_audio_sample_batch( data, frames );
+  } );
+
+
+  // set_input_poll(core_input_poll);
+  // set_input_state(core_input_state);
+
+  // set_audio_sample(core_audio_sample);
+  // set_audio_sample_batch(core_audio_sample_batch);
   
   g_retro.retro_init();
   g_retro.initialized = true;
