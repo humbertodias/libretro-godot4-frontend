@@ -2,7 +2,8 @@
 
 A GDExtension for libretro API to allow core loading in Godot 4.
 
-**Work in progress.**
+![gdretro-video-ok](https://github.com/user-attachments/assets/075841f3-ec1d-44a4-8e67-81299f1c64a6)
+
 
 ## Using the extension
 After compiling the extension succesfully, you can now use the libretro API inside Godot
