@@ -7,6 +7,7 @@
 #include <godot_cpp/classes/input_event.hpp>
 #include <godot_cpp/classes/ref.hpp>
 #include <godot_cpp/classes/node.hpp>
+#include <godot_cpp/classes/audio_stream_player.hpp>
 #include "libretro.h"
 
 using namespace godot;
@@ -21,6 +22,8 @@ class GDRetro : public Node2D {
   bool hflip = false;
   bool vflip = false;
   
+  AudioStreamPlayer* audio_player; // Using AudioStreamPlayer
+
   Ref<Texture2D> texture;
   void _texture_changed();
   void _get_rects(Rect2 &r_src_rect, Rect2 &r_dst_rect, bool &r_filter_clip_enabled) const;
@@ -73,6 +76,5 @@ class GDRetro : public Node2D {
     void core_audio_init( retro_system_av_info av );
     void core_audio_sample( int16_t left, int16_t right );
     size_t core_audio_sample_batch( const int16_t *data, size_t frames );
-
 
 };

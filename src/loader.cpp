@@ -44,9 +44,9 @@ static void die(const char * fmt, ...) {
 
 static void video_deinit() {}
 
-static void audio_init(int frequency) {
-  (void)frequency;
-}
+// static void audio_init(int frequency) {
+//   (void)frequency;
+// }
 
 static void audio_deinit() {}
 
@@ -122,14 +122,13 @@ bool core_load(const char * sofile) {
   );
 
   set_video_refresh( []( const void *data, unsigned width, unsigned height, size_t pitch ) {
-
     GDRetro::get_singleton()->core_video_refresh( data, width, height, pitch );
   });
 
   set_input_poll( []( void ) { GDRetro::get_singleton()->core_input_poll(); } );
 
   set_input_state( []( unsigned port, unsigned device, unsigned index, unsigned id ) {
-        return GDRetro::get_singleton()->core_input_state( port, device, index, id );
+    return GDRetro::get_singleton()->core_input_state( port, device, index, id );
   } );
 
   set_audio_sample(
@@ -214,8 +213,9 @@ bool core_load_game(const char * filename) {
     av.geometry.base_height);
 
   GDRetro::get_singleton()->video_configure( &av.geometry );
+  GDRetro::get_singleton()->core_audio_init( av );
 
-  audio_init(av.timing.sample_rate);
+  // audio_init(av.timing.sample_rate);
   return true;
 }
 

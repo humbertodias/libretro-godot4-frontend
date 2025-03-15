@@ -9,6 +9,7 @@ void core_get_system_info(struct retro_system_info *system);
 void core_get_system_av_info(struct retro_system_av_info *av);
 void core_run();
 bool is_initialized();
+// void audio_init(int frequency);  
 
 static struct {
     void * handle;

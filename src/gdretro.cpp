@@ -29,6 +29,12 @@ GDRetro *GDRetro::get_singleton()
 
 void GDRetro::_ready()
 {
+  // Initialize the audio player using the constructor
+  audio_player = memnew(AudioStreamPlayer); // Use memnew to allocate memory for AudioStreamPlayer
+  add_child(audio_player);  // Add it as a child to the scene
+
+  // Set volume and start playing
+  audio_player->set_volume_db(0.0);
 }
 
 void GDRetro::_process(double delta)
@@ -108,7 +114,6 @@ bool GDRetro::_is_initialized()
 {
   return is_initialized();
 }
-
 
 void GDRetro::set_texture(const Ref<Texture2D> &p_texture) {
   if (p_texture == texture) {
