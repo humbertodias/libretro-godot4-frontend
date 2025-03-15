@@ -4,23 +4,36 @@
 #include "godot_cpp/classes/image_texture.hpp"
 #include "godot_cpp/variant/utility_functions.hpp"
 
+static float g_scale = 3;
 
-void GDRetro::core_video_init(const struct retro_game_geometry *geometry)
-{
+static void resize_to_aspect(double ratio, int sw, int sh, int *dw, int *dh) {
+	*dw = sw;
+	*dh = sh;
 
-    if (!frame_buffer.is_valid()) {
-        godot::UtilityFunctions::printerr("[GDRetro] Framebuffer initialization failed.");
-        // return;
-    }
+	if (ratio <= 0)
+		ratio = (double)sw / sh;
 
-    godot::UtilityFunctions::print("[GDRetro] Video init ", geometry->base_width, " x ",
-                                    geometry->base_height);
-    this->frame_buffer = godot::Image::create(geometry->base_width, geometry->base_height, false,
-                                              this->pixel_format);
+	if ((float)sw / sh < 1)
+		*dw = *dh * ratio;
+	else
+		*dh = *dw / ratio;
 }
 
-void GDRetro::core_video_refresh(const void *data, unsigned width, unsigned height,
-                                   size_t pitch)
+void GDRetro::video_configure(const struct retro_game_geometry *geometry)
+{
+
+	int nwidth, nheight;
+
+	resize_to_aspect(geometry->aspect_ratio, geometry->base_width * 1, geometry->base_height * 1, &nwidth, &nheight);
+
+	nwidth *= g_scale;
+	nheight *= g_scale;
+
+    godot::UtilityFunctions::print("[GDRetro] Video init ", nwidth, " x ", nheight, " aspect ratio ", geometry->aspect_ratio);
+    this->frame_buffer = godot::Image::create(nwidth, nheight, false, this->pixel_format);
+}
+
+void GDRetro::core_video_refresh(const void *data, unsigned width, unsigned height, size_t pitch)
 {
     if (!data || frame_buffer.is_null() || !frame_buffer.is_valid())
     {
@@ -30,10 +43,8 @@ void GDRetro::core_video_refresh(const void *data, unsigned width, unsigned heig
     if ((unsigned)frame_buffer->get_width() != width ||
         (unsigned)frame_buffer->get_height() != height)
     {
-        godot::UtilityFunctions::print("[GDRetro] Resizing frame buffer to ", width, "x",
-                                       height);
-        auto created_frame_buffer =
-            godot::Image::create(width, height, false, frame_buffer->get_format());
+        godot::UtilityFunctions::print("[GDRetro] Resizing frame buffer to ", width, "x", height);
+        auto created_frame_buffer = godot::Image::create(width, height, false, frame_buffer->get_format());
         if (created_frame_buffer.is_null() || !created_frame_buffer.is_valid())
         {
             godot::UtilityFunctions::printerr("[GDRetro] Failed to recreate frame buffer");
@@ -42,48 +53,35 @@ void GDRetro::core_video_refresh(const void *data, unsigned width, unsigned heig
         frame_buffer = created_frame_buffer;
     }
 
-    unsigned buffer_size;
+    unsigned bytes_per_pixel = 0;
     switch (frame_buffer->get_format())
     {
         case godot::Image::FORMAT_RGB565:
-            buffer_size = width * height * 2;
+            bytes_per_pixel = 2;
             break;
         case godot::Image::FORMAT_RGBA8:
-        {
-            buffer_size = width * height * 4;
-
-#if defined(_MSC_VER) // MSVC compiler
-#pragma warning(push)
-#pragma warning(disable : 4244)
-#endif
-
-            uint32_t *data32 = (uint32_t *)data;
-            for (unsigned i = 0; i < width * height; i++)
-            {
-                uint32_t pixel = data32[i];
-                uint8_t alpha = (pixel & 0xFF000000) >> 24;
-                uint8_t red = (pixel & 0x00FF0000) >> 16;
-                uint8_t green = (pixel & 0x0000FF00) >> 8;
-                uint8_t blue = (pixel & 0x000000FF);
-                data32[i] = (alpha << 24) | (blue << 16) | (green << 8) | red;
-            }
-
-#if defined(_MSC_VER)
-#pragma warning(pop)
-#endif
-        }
-        break;
+            bytes_per_pixel = 4;
+            break;
         default:
             godot::UtilityFunctions::printerr("[GDRetro] Unhandled pixel format: ",
                                               frame_buffer->get_format());
             return;
     }
 
+    unsigned row_size = width * bytes_per_pixel;
     godot::PackedByteArray intermediary_buffer;
-    intermediary_buffer.resize(buffer_size);
-    memcpy((void *)intermediary_buffer.ptr(), data, buffer_size);
+    intermediary_buffer.resize(row_size * height);
+
+    const uint8_t *src = static_cast<const uint8_t *>(data);
+    uint8_t *dst = intermediary_buffer.ptrw();
+
+    for (unsigned y = 0; y < height; y++)
+    {
+        memcpy(dst + y * row_size, src + y * pitch, row_size);
+    }
 
     frame_buffer->set_data(width, height, false, frame_buffer->get_format(), intermediary_buffer);
+
 
     texture = ImageTexture::create_from_image(frame_buffer);
 }

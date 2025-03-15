@@ -46,7 +46,7 @@ class GDRetro : public Node2D {
     void set_texture(const Ref<Texture2D> &p_texture);
 	  Ref<Texture2D> get_texture() const;
 
-    void core_video_init( const struct retro_game_geometry *geometry );
+    void video_configure( const struct retro_game_geometry *geometry );
     void core_video_refresh( const void *data, unsigned width, unsigned height, size_t pitch );
     bool core_video_set_pixel_format( unsigned format );
     bool core_environment(unsigned cmd, void * data);

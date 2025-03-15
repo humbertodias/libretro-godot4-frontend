@@ -200,7 +200,6 @@ bool core_load_game(const char * filename) {
 
     if (!file) {
       printf("[gdretro] Error: Failed to load content from '%s'\n", filename);
-      fclose(file);
       return false;
     }
 
@@ -233,9 +232,7 @@ bool core_load_game(const char * filename) {
     av.geometry.base_width,
     av.geometry.base_height);
 
-//  video_configure(&av.geometry);
-  // MINE: core_video_init
-  GDRetro::get_singleton()->core_video_init( &av.geometry );
+  GDRetro::get_singleton()->video_configure( &av.geometry );
 
   audio_init(av.timing.sample_rate);
   return true;
