@@ -16,6 +16,9 @@ func _process(delta):
 		var img_tex = ImageTexture.create_from_image(frame_buffer)
 		$TextureRect.texture = img_tex
 
+func _input(event):
+	# Forward input events to the frontend
+	$gd_retro.forward_input(event)
 		
 func _on_button_core_pressed():
 	if $gd_retro.is_initialized():

@@ -2,6 +2,14 @@
 
 #include <libretro.h>
 
+bool core_load(const char *sofile);
+bool core_load_game(const char *filename);
+void core_unload();
+void core_get_system_info(struct retro_system_info *system);
+void core_get_system_av_info(struct retro_system_av_info *av);
+void core_run();
+bool is_initialized();
+
 static struct {
     void * handle;
     bool initialized;
@@ -30,12 +38,3 @@ static struct {
     // size_t retro_get_memory_size(unsigned id);
     retro_keyboard_event_t retro_keyboard_event_callback;
   } g_retro;
-
-  
-bool core_load(const char *sofile);
-bool core_load_game(const char *filename);
-void core_unload();
-void core_get_system_info(struct retro_system_info *system);
-void core_get_system_av_info(struct retro_system_av_info *av);
-void core_run();
-bool is_initialized();
