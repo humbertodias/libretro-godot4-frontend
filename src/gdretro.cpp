@@ -7,11 +7,18 @@ using namespace godot;
 
 GDRetro::GDRetro()
 {
+  godot::UtilityFunctions::print("[gdretro] Constructor called. Initializing singleton.");
   singleton = this;
+  this->frame_buffer.unref(); // Reset the Ref<godot::Image> properly
+  godot::UtilityFunctions::print("[gdretro] Initialization complete.");
 }
 
 GDRetro::~GDRetro()
 {
+  godot::UtilityFunctions::print("[gdretro] Destructor called. Cleaning up resources.");
+  this->_core_unload();
+  singleton = nullptr;
+  godot::UtilityFunctions::print("[gdretro] Resources cleaned up and singleton destroyed.");
 }
 
 GDRetro *GDRetro::singleton = nullptr;

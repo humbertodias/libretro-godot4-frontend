@@ -49,6 +49,8 @@ class GDRetro : public Node2D {
     void core_video_init( const struct retro_game_geometry *geometry );
     void core_video_refresh( const void *data, unsigned width, unsigned height, size_t pitch );
     bool core_video_set_pixel_format( unsigned format );
+    bool core_environment(unsigned cmd, void * data);
+
     godot::Image::Format pixel_format;
     godot::Ref<godot::Image> frame_buffer;
     godot::Ref<godot::Image> get_frame_buffer()

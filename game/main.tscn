@@ -1,7 +1,6 @@
-[gd_scene load_steps=4 format=3 uid="uid://biu372d1aoqwy"]
+[gd_scene load_steps=3 format=3 uid="uid://biu372d1aoqwy"]
 
 [ext_resource type="Script" uid="uid://brq5p78ecetad" path="res://main.gd" id="1_swau4"]
-[ext_resource type="Texture2D" uid="uid://cx1mscuegq1lo" path="res://icon.png" id="2_uh3hw"]
 
 [sub_resource type="ImageTexture" id="ImageTexture_af8hy"]
 
@@ -9,7 +8,6 @@
 script = ExtResource("1_swau4")
 
 [node name="gd_retro" type="GDRetro" parent="."]
-texture = ExtResource("2_uh3hw")
 position = Vector2(400, 150)
 
 [node name="file_dialog_core" type="FileDialog" parent="."]
