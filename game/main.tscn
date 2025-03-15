@@ -10,7 +10,6 @@ script = ExtResource("1_swau4")
 
 [node name="gd_retro" type="GDRetro" parent="."]
 texture = ExtResource("2_0xm2m")
-position = Vector2(400, 150)
 
 [node name="file_dialog_core" type="FileDialog" parent="."]
 title = "Load Core"

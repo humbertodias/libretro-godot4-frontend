@@ -82,8 +82,7 @@ void GDRetro::core_video_refresh(const void *data, unsigned width, unsigned heig
 
     frame_buffer->set_data(width, height, false, frame_buffer->get_format(), intermediary_buffer);
 
-
-    texture = ImageTexture::create_from_image(frame_buffer);
+    set_texture(ImageTexture::create_from_image(frame_buffer));
 }
 
 bool GDRetro::core_video_set_pixel_format(unsigned format)

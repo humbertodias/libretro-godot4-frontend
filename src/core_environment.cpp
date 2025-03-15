@@ -42,11 +42,6 @@ bool GDRetro::core_environment(unsigned cmd, void * data) {
       }
       break;
   
-      // case RETRO_ENVIRONMENT_SET_PIXEL_FORMAT: {
-      //   core_log(RETRO_LOG_DEBUG, "[gdretro] RETRO_ENVIRONMENT_SET_PIXEL_FORMAT");
-      //   return true;
-      // }
-  
       case RETRO_ENVIRONMENT_SET_PIXEL_FORMAT:
       {
           const enum retro_pixel_format *fmt = (enum retro_pixel_format *)data;

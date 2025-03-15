@@ -109,41 +109,19 @@ bool GDRetro::_is_initialized()
   return is_initialized();
 }
 
-void GDRetro::set_texture(const Ref<Texture2D> &p_texture)
-{
-  if (p_texture == texture)
-  {
-    return;
-  }
 
-  /*if (texture.is_valid()) {
-    texture->disconnect(CoreStringNames::get_singleton()->changed, callable_mp(this, &Sprite2D::_texture_changed));
-  }*/
+void GDRetro::set_texture(const Ref<Texture2D> &p_texture) {
+  if (p_texture == texture) {
+      return;
+  }
 
   texture = p_texture;
-
-  /*if (texture.is_valid()) {
-    texture->connect(CoreStringNames::get_singleton()->changed, callable_mp(this, &Sprite2D::_texture_changed));
-  }*/
-
   queue_redraw();
-  // emit_signal(SceneStringNames::get_singleton()->texture_changed);
-  // item_rect_changed();
+
 }
 
-Ref<Texture2D> GDRetro::get_texture() const
-{
+Ref<Texture2D> GDRetro::get_texture() const {
   return texture;
-}
-
-void GDRetro::_texture_changed()
-{
-  // Changes to the texture need to trigger an update to make
-  // the editor redraw the sprite with the updated texture.
-  if (texture.is_valid())
-  {
-    queue_redraw();
-  }
 }
 
 void GDRetro::_get_rects(Rect2 &r_src_rect, Rect2 &r_dst_rect, bool &r_filter_clip_enabled) const

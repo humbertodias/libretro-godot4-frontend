@@ -1,7 +1,7 @@
 extends Node
 
 var is_running = false
-
+	
 func _ready():
 	get_status()
 
@@ -16,6 +16,7 @@ func _process(delta):
 		var img_tex = ImageTexture.create_from_image(frame_buffer)
 		$TextureRect.texture = img_tex
 
+		
 func _on_button_core_pressed():
 	if $gd_retro.is_initialized():
 		$gd_retro.core_unload()
