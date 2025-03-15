@@ -8,6 +8,13 @@ func _ready():
 func _process(delta):
 	if is_running:
 		$gd_retro.core_run()
+		
+		var frame_buffer = $gd_retro.get_frame_buffer()
+		if(!frame_buffer):
+			return
+	
+		var img_tex = ImageTexture.create_from_image(frame_buffer)
+		$TextureRect.texture = img_tex
 
 func _on_button_core_pressed():
 	if $gd_retro.is_initialized():

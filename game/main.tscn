@@ -135,6 +135,13 @@ texture = SubResource("ImageTexture_af8hy")
 offset_right = 8.0
 offset_bottom = 8.0
 
+[node name="TextureRect" type="TextureRect" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
 [connection signal="file_selected" from="file_dialog_core" to="." method="_on_file_dialog_core_file_selected"]
 [connection signal="file_selected" from="file_dialog_game" to="." method="_on_file_dialog_game_file_selected"]
 [connection signal="pressed" from="ui_canvas_layer/ui/buttons_container_left/button_core" to="." method="_on_button_core_pressed"]

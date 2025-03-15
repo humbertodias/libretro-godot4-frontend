@@ -18,9 +18,11 @@
 #include "libretro.h"
 #include "loader.h"
 
+#include "gdretro.h"
+
+
 int width = 0;
 int height = 0;
-
 static struct {
   void * handle;
   bool initialized;
@@ -70,10 +72,12 @@ static void die(const char * fmt, ...) {
   exit(EXIT_FAILURE);
 }
 
-static void video_configure(const struct retro_game_geometry * geom) {
-  width = geom->max_width;
-  height = geom->max_height;
-}
+// static void video_configure(const struct retro_game_geometry * geom) {
+//   width = geom->max_width;
+//   height = geom->max_height;
+//   // MINE
+//   GDRetro::get_singleton()->core_video_init(geom);
+// }
 
 static void video_deinit() {}
 
@@ -122,9 +126,22 @@ static bool core_environment(unsigned cmd, void * data) {
     }
     break;
 
-    case RETRO_ENVIRONMENT_SET_PIXEL_FORMAT: {
-      core_log(RETRO_LOG_DEBUG, "[gdretro] RETRO_ENVIRONMENT_SET_PIXEL_FORMAT");
-      return true;
+    // case RETRO_ENVIRONMENT_SET_PIXEL_FORMAT: {
+    //   core_log(RETRO_LOG_DEBUG, "[gdretro] RETRO_ENVIRONMENT_SET_PIXEL_FORMAT");
+    //   return true;
+    // }
+
+    case RETRO_ENVIRONMENT_SET_PIXEL_FORMAT:
+    {
+        const enum retro_pixel_format *fmt = (enum retro_pixel_format *)data;
+
+        if ( *fmt > RETRO_PIXEL_FORMAT_RGB565 )
+        {
+            return false;
+        }
+
+        core_log(RETRO_LOG_DEBUG, "[gdretro] Core setting pixel format" );
+        return GDRetro::get_singleton()->core_video_set_pixel_format( *fmt );
     }
 
     case RETRO_ENVIRONMENT_GET_SYSTEM_DIRECTORY:
@@ -156,17 +173,6 @@ static bool core_environment(unsigned cmd, void * data) {
   }
 
   return true;
-}
-
-static void core_video_refresh(
-      const void* data,
-      unsigned width,
-      unsigned height,
-      size_t pitch) {
-  (void)data;
-  (void)width;
-  (void)height;
-  (void)pitch;
 }
 
 static void core_input_poll(void) {
@@ -232,8 +238,14 @@ bool core_load(const char * sofile) {
   load_sym(set_audio_sample, retro_set_audio_sample);
   load_sym(set_audio_sample_batch, retro_set_audio_sample_batch);
 
+ 
   set_environment(core_environment);
-  set_video_refresh(core_video_refresh);
+
+  set_video_refresh( []( const void *data, unsigned width, unsigned height, size_t pitch ) {
+    // MINE
+    GDRetro::get_singleton()->core_video_refresh( data, width, height, pitch );
+ } );
+
   set_input_poll(core_input_poll);
   set_input_state(core_input_state);
   set_audio_sample(core_audio_sample);
@@ -307,7 +319,10 @@ bool core_load_game(const char * filename) {
     av.geometry.base_width,
     av.geometry.base_height);
 
-  video_configure(&av.geometry);
+//  video_configure(&av.geometry);
+  // MINE: core_video_init
+  GDRetro::get_singleton()->core_video_init( &av.geometry );
+
   audio_init(av.timing.sample_rate);
   return true;
 }
@@ -342,6 +357,7 @@ void core_run() {
 bool is_initialized() {
   return g_retro.initialized;
 }
+
 
 /*int main(int argc, char * argv[]) {
   // Ensure proper amount of arguments.
