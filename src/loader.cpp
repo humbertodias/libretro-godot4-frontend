@@ -50,34 +50,6 @@ static void video_deinit() {}
 
 static void audio_deinit() {}
 
-
-static void core_input_poll(void) {
-  // Nothing
-}
-
-// static int16_t core_input_state(
-//       unsigned port,
-//       unsigned device,
-//       unsigned index,
-//       unsigned id) {
-//   (void)port;
-//   (void)device;
-//   (void)index;
-//   (void)id;
-//   return 0;
-// }
-
-// static void core_audio_sample(int16_t left, int16_t right) {
-//   (void)left;
-//   (void)right;
-// }
-
-// static size_t core_audio_sample_batch(const int16_t * data, size_t frames) {
-//   (void)data;
-//   (void)frames;
-//   return 0;
-// }
-
 bool core_load(const char * sofile) {
   void (*set_environment)(retro_environment_t) = NULL;
   void (*set_video_refresh)(retro_video_refresh_t) = NULL;
@@ -137,13 +109,6 @@ bool core_load(const char * sofile) {
   set_audio_sample_batch( []( const int16_t *data, size_t frames ) {
       return GDRetro::get_singleton()->core_audio_sample_batch( data, frames );
   } );
-
-
-  // set_input_poll(core_input_poll);
-  // set_input_state(core_input_state);
-
-  // set_audio_sample(core_audio_sample);
-  // set_audio_sample_batch(core_audio_sample_batch);
   
   g_retro.retro_init();
   g_retro.initialized = true;
@@ -215,7 +180,6 @@ bool core_load_game(const char * filename) {
   GDRetro::get_singleton()->video_configure( &av.geometry );
   GDRetro::get_singleton()->core_audio_init( av );
 
-  // audio_init(av.timing.sample_rate);
   return true;
 }
 

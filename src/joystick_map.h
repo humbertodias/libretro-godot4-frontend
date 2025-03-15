@@ -1,55 +1,27 @@
 #include "libretro.h"
 #include "godot_cpp/classes/global_constants.hpp"
+#include <unordered_map>
 
-unsigned godotButtonToRetroKey(godot::JoyButton joyButton) {
-    switch (joyButton) {
+unsigned godotButtonToRetroKey(godot::JoyButton joyButton)
+{
+    static const std::unordered_map<godot::JoyButton, unsigned> key_map = {
         // D-pad
-        case godot::JoyButton::JOY_BUTTON_DPAD_LEFT:
-            return RETRO_DEVICE_ID_JOYPAD_LEFT;
-        case godot::JoyButton::JOY_BUTTON_DPAD_RIGHT:
-            return RETRO_DEVICE_ID_JOYPAD_RIGHT;
-        case godot::JoyButton::JOY_BUTTON_DPAD_UP:
-            return RETRO_DEVICE_ID_JOYPAD_UP;
-        case godot::JoyButton::JOY_BUTTON_DPAD_DOWN:
-            return RETRO_DEVICE_ID_JOYPAD_DOWN;
+        {godot::JoyButton::JOY_BUTTON_DPAD_LEFT, RETRO_DEVICE_ID_JOYPAD_LEFT},
+        {godot::JoyButton::JOY_BUTTON_DPAD_RIGHT, RETRO_DEVICE_ID_JOYPAD_RIGHT},
+        {godot::JoyButton::JOY_BUTTON_DPAD_UP, RETRO_DEVICE_ID_JOYPAD_UP},
+        {godot::JoyButton::JOY_BUTTON_DPAD_DOWN, RETRO_DEVICE_ID_JOYPAD_DOWN},
 
         // Action Buttons (PS4: X, O, Square, Triangle)
-        case godot::JoyButton::JOY_BUTTON_A: // PS4: X
-            return RETRO_DEVICE_ID_JOYPAD_A;
-        case godot::JoyButton::JOY_BUTTON_B: // PS4: O
-            return RETRO_DEVICE_ID_JOYPAD_B;
-        case godot::JoyButton::JOY_BUTTON_X: // PS4: Square
-            return RETRO_DEVICE_ID_JOYPAD_X;
-        case godot::JoyButton::JOY_BUTTON_Y: // PS4: Triangle
-            return RETRO_DEVICE_ID_JOYPAD_Y;
+        {godot::JoyButton::JOY_BUTTON_A, RETRO_DEVICE_ID_JOYPAD_A},   // PS4: X
+        {godot::JoyButton::JOY_BUTTON_B, RETRO_DEVICE_ID_JOYPAD_B},   // PS4: O
+        {godot::JoyButton::JOY_BUTTON_X, RETRO_DEVICE_ID_JOYPAD_X},   // PS4: Square
+        {godot::JoyButton::JOY_BUTTON_Y, RETRO_DEVICE_ID_JOYPAD_Y},   // PS4: Triangle
 
         // Shoulder Buttons (PS4: L1, R1)
-        case godot::JoyButton::JOY_BUTTON_LEFT_SHOULDER: // PS4: L1
-            return RETRO_DEVICE_ID_JOYPAD_L;
-        case godot::JoyButton::JOY_BUTTON_RIGHT_SHOULDER: // PS4: R1
-            return RETRO_DEVICE_ID_JOYPAD_R;
+        {godot::JoyButton::JOY_BUTTON_LEFT_SHOULDER, RETRO_DEVICE_ID_JOYPAD_L},  // PS4: L1
+        {godot::JoyButton::JOY_BUTTON_RIGHT_SHOULDER, RETRO_DEVICE_ID_JOYPAD_R}  // PS4: R1
+    };
 
-        // // Trigger Buttons (PS4: L2, R2)
-        // case godot::JoyButton::JOY_BUTTON_L: // PS4: L2
-        //     return RETRO_DEVICE_ID_JOYPAD_L2;
-        // case godot::JoyButton::JOY_BUTTON_R2: // PS4: R2
-        //     return RETRO_DEVICE_ID_JOYPAD_R2;
-
-        // // Additional Buttons (PS4: L3, R3, Options, Share, etc.)
-        // case godot::JoyButton::JOY_BUTTON_L3: // PS4: L3
-        //     return RETRO_DEVICE_ID_JOYPAD_L3;
-        // case godot::JoyButton::JOY_BUTTON_R3: // PS4: R3
-        //     return RETRO_DEVICE_ID_JOYPAD_R3;
-        // case godot::JoyButton::JOY_BUTTON_START: // PS4: Options
-        //     return RETRO_DEVICE_ID_JOYPAD_START;
-        // case godot::JoyButton::JOY_BUTTON_SELECT: // PS4: Share
-        //     return RETRO_DEVICE_ID_JOYPAD_SELECT;
-
-        // // Touchpad (PS4)
-        // case godot::JoyButton::JOY_BUTTON_TOUCHPAD:
-        //     return RETRO_DEVICE_ID_JOYPAD_TOUCHPAD;
-
-        default:
-            return 0; // If the button is not mapped, return 0 or another error value.
-    }
+    auto it = key_map.find(joyButton);
+    return (it != key_map.end()) ? it->second : RETROK_UNKNOWN;
 }

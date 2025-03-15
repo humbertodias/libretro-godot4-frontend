@@ -24,14 +24,14 @@ GDRetro::~GDRetro()
 GDRetro *GDRetro::singleton = nullptr;
 GDRetro *GDRetro::get_singleton()
 {
-    return singleton;
+  return singleton;
 }
 
 void GDRetro::_ready()
 {
   // Initialize the audio player using the constructor
   audio_player = memnew(AudioStreamPlayer); // Use memnew to allocate memory for AudioStreamPlayer
-  add_child(audio_player);  // Add it as a child to the scene
+  add_child(audio_player);                  // Add it as a child to the scene
 
   // Set volume and start playing
   audio_player->set_volume_db(0.0);
@@ -115,17 +115,19 @@ bool GDRetro::_is_initialized()
   return is_initialized();
 }
 
-void GDRetro::set_texture(const Ref<Texture2D> &p_texture) {
-  if (p_texture == texture) {
-      return;
+void GDRetro::set_texture(const Ref<Texture2D> &p_texture)
+{
+  if (p_texture == texture)
+  {
+    return;
   }
 
   texture = p_texture;
   queue_redraw();
-
 }
 
-Ref<Texture2D> GDRetro::get_texture() const {
+Ref<Texture2D> GDRetro::get_texture() const
+{
   return texture;
 }
 
@@ -146,10 +148,6 @@ void GDRetro::_get_rects(Rect2 &r_src_rect, Rect2 &r_dst_rect, bool &r_filter_cl
   {
     dest_offset -= frame_size / 2;
   }
-
-  /*if (get_viewport() && get_viewport()->is_snap_2d_transforms_to_pixel_enabled()) {
-    dest_offset = dest_offset.floor();
-  }*/
 
   r_dst_rect = Rect2(dest_offset, frame_size);
 
@@ -199,7 +197,7 @@ void GDRetro::_bind_methods()
   ClassDB::bind_method(D_METHOD("set_texture", "texture"), &GDRetro::set_texture);
   ClassDB::bind_method(D_METHOD("get_texture"), &GDRetro::get_texture);
   ClassDB::bind_method(D_METHOD("get_frame_buffer"), &GDRetro::get_frame_buffer);
-  ClassDB::bind_method(D_METHOD("forward_input", "event" ), &GDRetro::forwarded_input );
+  ClassDB::bind_method(D_METHOD("forward_input", "event"), &GDRetro::forwarded_input);
 
   ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "texture", PROPERTY_HINT_RESOURCE_TYPE, "Texture2D"), "set_texture", "get_texture");
 }

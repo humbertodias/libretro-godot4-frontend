@@ -19,16 +19,13 @@ void GDRetro::core_audio_init(retro_system_av_info av)
     godot::UtilityFunctions::print("[GDRetro] Audio init");
     int sample_rate = static_cast<int>(av.timing.sample_rate);
 
-    // Criar um AudioStreamGenerator
     audio_stream.instantiate();
     audio_stream->set_mix_rate(sample_rate);
     audio_stream->set_buffer_length(0.1f);
 
-    // Criar um AudioStreamPlayer
     audio_player = memnew(AudioStreamPlayer);
     audio_player->set_stream(audio_stream);
     
-    // Adicionar o AudioStreamPlayer à cena antes de chamar play()
     SceneTree *scene_tree = Object::cast_to<SceneTree>(Engine::get_singleton()->get_main_loop());
     if (scene_tree)
     {
@@ -74,7 +71,6 @@ size_t GDRetro::core_audio_sample_batch(const int16_t *data, size_t frames)
     if (!audio_playback)
         return 0;
 
-    // Check if data is null or if the number of frames is zero
     if (!data || frames == 0)
         return 0;
 
