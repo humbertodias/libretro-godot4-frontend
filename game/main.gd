@@ -5,7 +5,7 @@ var is_running = false
 func _ready():
 	get_status()
 
-func _process(delta):
+func _process(_delta):
 	if is_running:
 		$gd_retro.core_run()
 		
