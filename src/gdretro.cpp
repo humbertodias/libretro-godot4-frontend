@@ -10,6 +10,7 @@ GDRetro::GDRetro()
   godot::UtilityFunctions::print("[gdretro] Constructor called. Initializing singleton.");
   singleton = this;
   this->frame_buffer.unref(); // Reset the Ref<godot::Image> properly
+  this->vfs.init_vfs_interface();
   godot::UtilityFunctions::print("[gdretro] Initialization complete.");
 }
 

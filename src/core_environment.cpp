@@ -65,9 +65,38 @@ bool GDRetro::core_environment(unsigned cmd, void *data)
         // const struct retro_keyboard_callback
         auto callback = (const struct retro_keyboard_callback *)data;
         g_retro.retro_keyboard_event_callback = callback->callback;
-        godot::UtilityFunctions::print( "[RetroHost] keyboard callback set" );
+        godot::UtilityFunctions::print( "[gdretro] keyboard callback set" );
     }
     break;
+
+
+    case RETRO_ENVIRONMENT_GET_VFS_INTERFACE: {
+        auto vfs_interface = (struct retro_vfs_interface_info *)data;
+        godot::UtilityFunctions::print( "[gdretro] Core requested VFS interface" );
+        if(vfs_interface->required_interface_version > this->vfs.supported_interface_version) {
+            godot::UtilityFunctions::printerr( "[gdretro] Core requested VFS interface v", vfs_interface->required_interface_version, " we only support up to v", this->vfs.supported_interface_version );
+            return false;
+        }
+        godot::UtilityFunctions::print( "[gdretro] Core requested VFS interface v", vfs_interface->required_interface_version);
+        vfs_interface->iface = &this->vfs.vfs_interface;
+        return true;
+    }
+    break;
+
+
+    case RETRO_ENVIRONMENT_GET_CORE_OPTIONS_VERSION: {
+        unsigned *version = (unsigned *)data;
+        // TODO: Support higher versions
+        *version = 0;
+        return false;
+    }
+
+    case RETRO_ENVIRONMENT_GET_MESSAGE_INTERFACE_VERSION: {
+        unsigned *version = (unsigned *)data;
+        *version = 0;
+        return false;
+    }
+    break;    
 
 
     case RETRO_ENVIRONMENT_GET_SYSTEM_DIRECTORY:
