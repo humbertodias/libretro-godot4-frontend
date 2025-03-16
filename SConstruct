@@ -2,6 +2,10 @@
 import os
 import sys
 
+# Check if target is provided, if not, set it to 'template_release'
+if "target" not in env:
+    env["target"] = "template_release"
+    
 env = SConscript("godot-cpp/SConstruct")
 
 # For the reference:
