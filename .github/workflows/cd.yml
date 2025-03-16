@@ -71,16 +71,16 @@ jobs:
 
     - name: Create build directories
       run: |
-        mkdir -p builds/Linux builds/Windows builds/macOS builds/Web builds/Android
+        mkdir -p builds/{Linux,Windows,macOS,Web,Android}
 
     - name: Export Game
       run: |
         godot --headless --export-release "Linux" "builds/Linux/libretro-godot4-frontend.x86_64" &
         godot --headless --export-release "macOS" "builds/macOS/libretro-godot4-frontend.zip" &
+        wait
 #        godot --headless --export-release "Android" "builds/Android/libretro-godot4-frontend.apk" &
 #        godot --headless --export-release "Web" "builds/Web/libretro-godot4-frontend.wasm" &
 #        godot --headless --export-release "Windows" "builds/Windows/libretro-godot4-frontend.exe" &
-        wait
 
     - name: Compress Builds
       run: |
