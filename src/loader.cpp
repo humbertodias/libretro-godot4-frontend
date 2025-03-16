@@ -293,6 +293,10 @@ void core_get_system_av_info(struct retro_system_av_info *av)
 void core_run()
 {
   g_retro.retro_run();
+  // Ask the core to emit the audio.
+  if (audio_callback.callback) {
+    audio_callback.callback();
+  }
 }
 
 bool is_initialized()
@@ -311,7 +315,6 @@ bool is_initialized()
   if (!core_load(argv[1])) {
     return 1;
   }
-  puts("[gdretro] Core loaded");
 
   // Load the game if needed.
   if (!core_load_game((argc > 2) ? argv[2] : NULL)) {

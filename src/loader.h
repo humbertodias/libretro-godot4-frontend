@@ -1,6 +1,7 @@
 #pragma once
 
 #include <libretro.h>
+#include "audio.h"
 
 bool core_load(const char *sofile);
 bool core_load_game(const char *filename);
@@ -14,6 +15,7 @@ static struct
 {
   void *handle;
   bool initialized;
+  bool supports_no_game;
 
   void (*retro_init)(void);
   void (*retro_deinit)(void);

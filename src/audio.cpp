@@ -1,5 +1,6 @@
 #include "gdretro.h"
 #include "libretro.h"
+#include "audio.h"
 #include "godot_cpp/classes/audio_server.hpp"
 #include "godot_cpp/classes/audio_stream_generator.hpp"
 #include "godot_cpp/classes/audio_stream_generator_playback.hpp"
@@ -45,6 +46,11 @@ void GDRetro::audio_init(double sample_rate)
     if (!audio_playback)
     {
         godot::UtilityFunctions::printerr("[GDRetro] Error: Failed to cast playback to AudioStreamGeneratorPlayback.");
+    }
+
+    // Let the core know that the audio device has been initialized.
+    if (audio_callback.set_state) {
+        audio_callback.set_state(true);
     }
 
 }

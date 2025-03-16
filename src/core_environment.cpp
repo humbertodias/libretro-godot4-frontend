@@ -98,6 +98,11 @@ bool GDRetro::core_environment(unsigned cmd, void *data)
     }
     break;    
 
+    case RETRO_ENVIRONMENT_SET_AUDIO_CALLBACK: {
+        struct retro_audio_callback *audio_cb = (struct retro_audio_callback*)data;
+        audio_callback = *audio_cb;
+        return true;
+    }
 
     case RETRO_ENVIRONMENT_GET_SYSTEM_DIRECTORY:
     case RETRO_ENVIRONMENT_GET_SAVE_DIRECTORY:
@@ -122,6 +127,16 @@ bool GDRetro::core_environment(unsigned cmd, void *data)
     {
         core_log(RETRO_LOG_DEBUG, "[gdretro] RETRO_ENVIRONMENT_SHUTDOWN");
         break;
+    }
+
+    case RETRO_ENVIRONMENT_SET_SUPPORT_NO_GAME: {
+        g_retro.supports_no_game = *(bool*)data;
+        return true;
+    }
+    case RETRO_ENVIRONMENT_GET_AUDIO_VIDEO_ENABLE: {
+        int *value = (int*)data;
+        *value = 1 << 0 | 1 << 1;
+        return true;
     }
 
     default:
