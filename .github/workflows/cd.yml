@@ -48,11 +48,11 @@ jobs:
 
     - name: Compile godot-cpp
       run: |
-        (cd godot-cpp && scons)
+        (cd godot-cpp && scons target=template_release)
     
     - name: Compile main project
       run: |
-        scons
+        scons target=template_release
 
     - name: Set up Godot 4
       uses: firebelley/godot-export@v6.0.0
