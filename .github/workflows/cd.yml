@@ -64,39 +64,46 @@ jobs:
         cache: true
         verbose: true
 
-    - name: Create build directory
-      run: mkdir -p builds/
+    - name: Create build directories
+      run: |
+        mkdir -p builds/{Linux,Windows,macOS,Web,Android}
 
     - name: Export for Web (WASM)
       run: |
-        godot --headless --export-release "Web" "builds/libretro-godot4-frontend.wasm"
+        godot --headless --export-release "Web" "builds/Web/libretro-godot4-frontend.wasm"
       env:
         GODOT_DEBUG: 'false'
 
     - name: Export for Windows
       run: |
-        godot --headless --export-release "Windows Desktop" "builds/libretro-godot4-frontend.exe"
+        godot --headless --export-release "Windows" "builds/Windows/libretro-godot4-frontend.exe"
 
     - name: Export for Linux
       run: |
-        godot --headless --export-release "Linux/X11" "builds/libretro-godot4-frontend.x86_64"
+        godot --headless --export-release "Linux" "builds/Linux/libretro-godot4-frontend.x86_64"
 
     - name: Export for macOS
       run: |
-        godot --headless --export-release "macOS" "builds/libretro-godot4-frontend.zip"
+        godot --headless --export-release "macOS" "builds/macOS/libretro-godot4-frontend.zip"
 
     - name: Export for Android
       run: |
-        godot --headless --export-release "Android" "builds/libretro-godot4-frontend.apk"
+        godot --headless --export-release "Android" "builds/Android/libretro-godot4-frontend.apk"
+
+    - name: Compress Builds
+      run: |
+        cd builds
+        zip -r Web.zip Web/
+        zip -r Windows.zip Windows/
+        zip -r Linux.zip Linux/
+        zip -r macOS.zip macOS/
+        zip -r Android.zip Android/
 
     - name: Upload Builds to GitHub Release
       uses: softprops/action-gh-release@v2
       with:
         files: |
-          builds/*.wasm
-          builds/*.exe
-          builds/*.x86_64
           builds/*.zip
-          builds/*.apk
+
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
