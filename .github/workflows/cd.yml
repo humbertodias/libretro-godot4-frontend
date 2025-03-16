@@ -12,6 +12,15 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v4
 
+    - name: Set up dependencies
+      run: |
+        sudo apt update -y && sudo apt install scons
+
+    - name: Compile
+      run: |
+        (cd godot-cpp && scons)
+        scons
+
     - name: Set up Godot 4
       uses: firebelley/godot-export@v6.0.0
       with:
@@ -19,6 +28,7 @@ jobs:
         export-debug: true
         export-release: true
         use-godot-export-template: true
+        relative_project_path: ./game
 
     - name: Create build directory
       run: mkdir -p builds/
