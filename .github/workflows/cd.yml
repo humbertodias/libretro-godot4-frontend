@@ -79,4 +79,4 @@ jobs:
         token: ${{ secrets.GITHUB_TOKEN }}
         generateReleaseNotes: true
         tag: ${{ github.ref_name }}
-        artifacts: ${{ steps.export.outputs.archive_directory }}/*
+        artifacts: /home/runner/.local/share/godot/archives/Linux.zip
