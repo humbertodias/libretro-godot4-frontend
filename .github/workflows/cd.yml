@@ -68,34 +68,15 @@ jobs:
         relative_project_path: ./game
         cache: true
         verbose: true
+        presets_to_export: 'Linux'
+        archive_output: true
 
-    - name: Create build directories
-      run: |
-        mkdir -p builds/{Linux,Windows,macOS,Web,Android}
-
-    - name: Export Game
-      run: |
-        godot --headless --export-release "Linux" "builds/Linux/libretro-godot4-frontend.x86_64" &
-        wait
-#        godot --headless --export-release "macOS" "builds/macOS/libretro-godot4-frontend.zip" &
-#        godot --headless --export-release "Android" "builds/Android/libretro-godot4-frontend.apk" &
-#        godot --headless --export-release "Web" "builds/Web/libretro-godot4-frontend.wasm" &
-#        godot --headless --export-release "Windows" "builds/Windows/libretro-godot4-frontend.exe" &
-
-    - name: Compress Builds
-      run: |
-        cd builds
-        zip -r Linux.zip Linux/
-#        zip -r macOS.zip macOS/
-#        zip -r Android.zip Android/
-#        zip -r Web.zip Web/
-#        zip -r Windows.zip Windows/
-
-    - name: Upload Builds to GitHub Release
-      uses: softprops/action-gh-release@v2
+      # This release action has worked well for me. However, you can most likely use any release action of your choosing.
+      # https://github.com/ncipollo/release-action
+    - name: create release
+      uses: ncipollo/release-action@v1.16.0
       with:
-        files: |
-          builds/*.zip
-
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        token: ${{ secrets.GITHUB_TOKEN }}
+        generateReleaseNotes: true
+        tag: ${{ github.ref_name }}
+        artifacts: ${{ steps.export.outputs.archive_directory }}/*
