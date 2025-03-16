@@ -71,7 +71,7 @@ jobs:
 
     - name: Create build directories
       run: |
-        mkdir -p builds/{Linux,Windows,macOS,Web,Android}
+        mkdir -p builds/Linux builds/Windows builds/macOS builds/Web builds/Android
 
     - name: Export Game
       run: |
