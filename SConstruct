@@ -31,6 +31,23 @@ if env["platform"] == "macos":
         ),
         source=sources,
     )
+elif env["platform"] == "web":
+
+    # Set specific flags for WebAssembly compilation
+    env.Append(CPPFLAGS=["-DWEBASSEMBLY", "-std=c++17"])
+    env.Append(LINKFLAGS=["--no-entry", "-s WASM=1", "-s ALLOW_MEMORY_GROWTH=1", "-s EXPORT_ALL=1", "-s EXPORTED_FUNCTIONS=['_main', '_gdretro_library_init']"])
+
+    # Use Emscripten's emcc and em++ for WebAssembly compilation
+    env["CC"] = "emcc"
+    env["CXX"] = "em++"
+    env["LINK"] = "emcc"
+
+    # For WebAssembly, the output is typically a .wasm file with Emscripten
+    library = env.Program(
+        "game/bin/libgdretro.{}.{}.wasm".format(env["platform"], env["target"]),
+        source=Glob("src/*.cpp"),
+    )
+
 else:
     library = env.SharedLibrary(
         "game/bin/libgdretro{}{}".format(env["suffix"], env["SHLIBSUFFIX"]),
