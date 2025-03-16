@@ -1,3 +1,5 @@
+[![CD](https://github.com/humbertodias/libretro-godot4-frontend/actions/workflows/cd.yml/badge.svg)](https://github.com/humbertodias/libretro-godot4-frontend/actions/workflows/cd.yml)
+
 # libretro-godot4-frontend
 
 A GDExtension for libretro API to allow core loading in Godot 4.
