@@ -76,8 +76,8 @@ jobs:
     - name: Export Game
       run: |
         godot --headless --export-release "Linux" "builds/Linux/libretro-godot4-frontend.x86_64" &
-        godot --headless --export-release "macOS" "builds/macOS/libretro-godot4-frontend.zip" &
         wait
+#        godot --headless --export-release "macOS" "builds/macOS/libretro-godot4-frontend.zip" &
 #        godot --headless --export-release "Android" "builds/Android/libretro-godot4-frontend.apk" &
 #        godot --headless --export-release "Web" "builds/Web/libretro-godot4-frontend.wasm" &
 #        godot --headless --export-release "Windows" "builds/Windows/libretro-godot4-frontend.exe" &
@@ -86,7 +86,7 @@ jobs:
       run: |
         cd builds
         zip -r Linux.zip Linux/
-        zip -r macOS.zip macOS/
+#        zip -r macOS.zip macOS/
 #        zip -r Android.zip Android/
 #        zip -r Web.zip Web/
 #        zip -r Windows.zip Windows/
