@@ -1,4 +1,4 @@
-name: Continuous Deployment - Release
+name: CD
 on:
   push:
     tags:
