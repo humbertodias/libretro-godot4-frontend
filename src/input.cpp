@@ -50,7 +50,7 @@ int16_t GDRetro::core_input_state( unsigned port, unsigned device, unsigned inde
             }
             return joypad_state[id] ? 1 : 0;
         default:
-            godot::UtilityFunctions::print("Device: ", device, " not found");
+            // godot::UtilityFunctions::print("Device: ", device, " not found");
             return 0;
     }
 }
