@@ -17,17 +17,22 @@
 #include <dlfcn.h>
 #include "libretro.h"
 #include "loader.h"
-
 #include "gdretro.h"
 
+int width = 0;
+int height = 0;
 
-#define load_sym(V, S) do {\
-  if (!((*(void**)&V) = dlsym(g_retro.handle, #S))) /** NOLINT **/ \
-    die("[gdretro] Failed to load symbol '" #S "'': %s", dlerror()); \
+
+#define load_sym(V, S)                                                 \
+  do                                                                   \
+  {                                                                    \
+    if (!((*(void **)&V) = dlsym(g_retro.handle, #S))) /** NOLINT **/  \
+      die("[gdretro] Failed to load symbol '" #S "'': %s", dlerror()); \
   } while (0)
 #define load_retro_sym(S) load_sym(g_retro.S, S)
 
-static void die(const char * fmt, ...) {
+static void die(const char *fmt, ...)
+{
   char buffer[4096];
 
   va_list va;
@@ -42,15 +47,105 @@ static void die(const char * fmt, ...) {
   exit(EXIT_FAILURE);
 }
 
-static void video_deinit() {}
+static void video_init(const struct retro_game_geometry *geom)
+{
+  width = geom->max_width;
+  height = geom->max_height;
+  GDRetro::get_singleton()->video_init(geom);
+}
 
-// static void audio_init(int frequency) {
-//   (void)frequency;
-// }
+static void video_deinit() {
+  GDRetro::get_singleton()->video_deinit();
+}
 
-static void audio_deinit() {}
+static void audio_init(int frequency)
+{
+  (void)frequency;
+  GDRetro::get_singleton()->audio_init(frequency);
+}
 
-bool core_load(const char * sofile) {
+static void audio_deinit() {
+  GDRetro::get_singleton()->audio_deinit();
+}
+
+static void core_log(enum retro_log_level level, const char *fmt, ...)
+{
+  char buffer[4096] = {0};
+  static const char *levelstr[] = {
+      "dbg",
+      "inf",
+      "wrn",
+      "err"};
+  va_list va;
+
+  va_start(va, fmt);
+  vsnprintf(buffer, sizeof(buffer), fmt, va);
+  va_end(va);
+
+  if (level == 0)
+    return;
+
+  fprintf(stderr, "[%s] %s", levelstr[level], buffer);
+  fflush(stderr);
+
+  if (level == RETRO_LOG_ERROR)
+  {
+    exit(EXIT_FAILURE);
+  }
+}
+
+static bool core_environment(unsigned cmd, void *data)
+{
+  return GDRetro::get_singleton()->core_environment(cmd, data);
+}
+
+static void core_video_refresh(
+    const void *data,
+    unsigned width,
+    unsigned height,
+    size_t pitch)
+{
+  (void)data;
+  (void)width;
+  (void)height;
+  (void)pitch;
+  GDRetro::get_singleton()->core_video_refresh(data, width, height, pitch);
+}
+
+static void core_input_poll(void)
+{
+  GDRetro::get_singleton()->core_input_poll();
+}
+
+static int16_t core_input_state(
+    unsigned port,
+    unsigned device,
+    unsigned index,
+    unsigned id)
+{
+  (void)port;
+  (void)device;
+  (void)index;
+  (void)id;
+  return GDRetro::get_singleton()->core_input_state(port, device, index, id);
+}
+
+static void core_audio_sample(int16_t left, int16_t right)
+{
+  (void)left;
+  (void)right;
+  GDRetro::get_singleton()->core_audio_sample(left, right);
+}
+
+static size_t core_audio_sample_batch(const int16_t *data, size_t frames)
+{
+  (void)data;
+  (void)frames;
+  return GDRetro::get_singleton()->core_audio_sample_batch(data, frames);
+}
+
+bool core_load(const char *sofile)
+{
   void (*set_environment)(retro_environment_t) = NULL;
   void (*set_video_refresh)(retro_video_refresh_t) = NULL;
   void (*set_input_poll)(retro_input_poll_t) = NULL;
@@ -58,10 +153,11 @@ bool core_load(const char * sofile) {
   void (*set_audio_sample)(retro_audio_sample_t) = NULL;
   void (*set_audio_sample_batch)(retro_audio_sample_batch_t) = NULL;
 
-  memset( & g_retro, 0, sizeof(g_retro));
+  memset(&g_retro, 0, sizeof(g_retro));
   g_retro.handle = dlopen(sofile, RTLD_LAZY);
 
-  if (!g_retro.handle) {
+  if (!g_retro.handle)
+  {
     printf("[gdretro] Failed to load core: %s\n", dlerror());
     return false;
   }
@@ -78,72 +174,53 @@ bool core_load(const char * sofile) {
   load_retro_sym(retro_run);
   load_retro_sym(retro_load_game);
   load_retro_sym(retro_unload_game);
-  // load_retro_sym(retro_keyboard_event_callback);
 
   load_sym(set_environment, retro_set_environment);
   load_sym(set_video_refresh, retro_set_video_refresh);
   load_sym(set_input_poll, retro_set_input_poll);
   load_sym(set_input_state, retro_set_input_state);
-  // load_sym(retro_keyboard_event_callback, retro_keyboard_event_callback);
   load_sym(set_audio_sample, retro_set_audio_sample);
   load_sym(set_audio_sample_batch, retro_set_audio_sample_batch);
 
- 
-  set_environment([]( unsigned cmd, void *data ) { 
-    return GDRetro::get_singleton()->core_environment( cmd, data ); } 
-  );
+  set_environment(core_environment);
+  set_video_refresh(core_video_refresh);
+  set_input_poll(core_input_poll);
+  set_input_state(core_input_state);
+  set_audio_sample(core_audio_sample);
+  set_audio_sample_batch(core_audio_sample_batch);
 
-  set_video_refresh( []( const void *data, unsigned width, unsigned height, size_t pitch ) {
-    GDRetro::get_singleton()->core_video_refresh( data, width, height, pitch );
-  });
-
-  set_input_poll( []( void ) { GDRetro::get_singleton()->core_input_poll(); } );
-
-  set_input_state( []( unsigned port, unsigned device, unsigned index, unsigned id ) {
-    return GDRetro::get_singleton()->core_input_state( port, device, index, id );
-  } );
-
-  set_audio_sample(
-      []( int16_t left, int16_t right ) { GDRetro::get_singleton()->core_audio_sample( left, right ); } );
-
-  set_audio_sample_batch( []( const int16_t *data, size_t frames ) {
-      return GDRetro::get_singleton()->core_audio_sample_batch( data, frames );
-  } );
-  
   g_retro.retro_init();
   g_retro.initialized = true;
-  
+
   puts("[gdretro] Core loaded");
-  
+
   return true;
 }
 
-bool core_load_game(const char * filename) {
+bool core_load_game(const char *filename)
+{
   struct retro_system_timing timing = {
-    60.0f, 10000.0f
-  };
+      60.0f, 10000.0f};
   struct retro_game_geometry geom = {
-    100, 100, 100, 100, 1.0f
-  };
+      100, 100, 100, 100, 1.0f};
   struct retro_system_av_info av = {
-    geom, timing
-  };
+      geom, timing};
   struct retro_system_info system = {
-    0, 0, 0, false, false
-  };
+      0, 0, 0, false, false};
 
   struct retro_game_info info = {
-    filename,
-    0,
-    0,
-    NULL
-  };
+      filename,
+      0,
+      0,
+      NULL};
 
-  FILE* file = NULL;
-  if (filename) {
+  FILE *file = NULL;
+  if (filename)
+  {
     file = fopen(filename, "rb");
 
-    if (!file) {
+    if (!file)
+    {
       printf("[gdretro] Error: Failed to load content from '%s'\n", filename);
       return false;
     }
@@ -156,10 +233,12 @@ bool core_load_game(const char * filename) {
   g_retro.retro_get_system_info(&system);
   printf("[gdretro] Info: %s %s\n", system.library_name, system.library_version);
 
-  if (filename && !system.need_fullpath) {
+  if (filename && !system.need_fullpath)
+  {
     info.data = malloc(info.size);
 
-    if (!info.data || !fread((void * ) info.data, info.size, 1, file)) { // NOLINT
+    if (!info.data || !fread((void *)info.data, info.size, 1, file))
+    { // NOLINT
       puts("[gdretro] Error: Failed to load game data.");
       fclose(file);
       return false;
@@ -167,53 +246,59 @@ bool core_load_game(const char * filename) {
     fclose(file);
   }
 
-  if (!g_retro.retro_load_game(&info)) {
+  if (!g_retro.retro_load_game(&info))
+  {
     puts("[gdretro] The core failed to load the game.");
     return false;
   }
 
   g_retro.retro_get_system_av_info(&av);
   printf("[gdretro] Video: %ix%i\n",
-    av.geometry.base_width,
-    av.geometry.base_height);
+         av.geometry.base_width,
+         av.geometry.base_height);
 
-  GDRetro::get_singleton()->video_configure( &av.geometry );
-  GDRetro::get_singleton()->core_audio_init( av );
-
+  video_init(&av.geometry);
+  audio_init(av.timing.sample_rate);
   return true;
 }
 
-void core_unload() {
-  if (g_retro.initialized) {
+void core_unload()
+{
+  if (g_retro.initialized)
+  {
     g_retro.retro_deinit();
   }
 
-  if (g_retro.handle) {
+  if (g_retro.handle)
+  {
     dlclose(g_retro.handle);
   }
-  
+
   audio_deinit();
   video_deinit();
-  
+
   puts("[gdretro] Core unloaded");
 }
 
-void core_get_system_info(struct retro_system_info *system) {
+void core_get_system_info(struct retro_system_info *system)
+{
   g_retro.retro_get_system_info(system);
 }
 
-void core_get_system_av_info(struct retro_system_av_info *av) {
+void core_get_system_av_info(struct retro_system_av_info *av)
+{
   g_retro.retro_get_system_av_info(av);
 }
 
-void core_run() {
+void core_run()
+{
   g_retro.retro_run();
 }
 
-bool is_initialized() {
+bool is_initialized()
+{
   return g_retro.initialized;
 }
-
 
 /*int main(int argc, char * argv[]) {
   // Ensure proper amount of arguments.

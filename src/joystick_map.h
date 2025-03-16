@@ -12,8 +12,8 @@ unsigned godotButtonToRetroKey(godot::JoyButton joyButton)
         {godot::JoyButton::JOY_BUTTON_DPAD_DOWN, RETRO_DEVICE_ID_JOYPAD_DOWN},
 
         // Action Buttons (PS4: X, O, Square, Triangle)
-        {godot::JoyButton::JOY_BUTTON_A, RETRO_DEVICE_ID_JOYPAD_A},   // PS4: X
-        {godot::JoyButton::JOY_BUTTON_B, RETRO_DEVICE_ID_JOYPAD_B},   // PS4: O
+        {godot::JoyButton::JOY_BUTTON_B, RETRO_DEVICE_ID_JOYPAD_A},   // PS4: X
+        {godot::JoyButton::JOY_BUTTON_A, RETRO_DEVICE_ID_JOYPAD_B},   // PS4: O
         {godot::JoyButton::JOY_BUTTON_X, RETRO_DEVICE_ID_JOYPAD_X},   // PS4: Square
         {godot::JoyButton::JOY_BUTTON_Y, RETRO_DEVICE_ID_JOYPAD_Y},   // PS4: Triangle
 

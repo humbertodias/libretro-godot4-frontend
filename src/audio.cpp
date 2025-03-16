@@ -14,11 +14,9 @@ using namespace godot;
 Ref<AudioStreamGenerator> audio_stream;
 AudioStreamGeneratorPlayback *audio_playback = nullptr;
 
-void GDRetro::core_audio_init(retro_system_av_info av)
+void GDRetro::audio_init(double sample_rate)
 {
     godot::UtilityFunctions::print("[GDRetro] Audio init");
-    int sample_rate = static_cast<int>(av.timing.sample_rate);
-
     audio_stream.instantiate();
     audio_stream->set_mix_rate(sample_rate);
     audio_stream->set_buffer_length(0.1f);
@@ -49,6 +47,10 @@ void GDRetro::core_audio_init(retro_system_av_info av)
         godot::UtilityFunctions::printerr("[GDRetro] Error: Failed to cast playback to AudioStreamGeneratorPlayback.");
     }
 
+}
+
+void GDRetro::audio_deinit(){
+    // TODO
 }
 
 void GDRetro::core_audio_sample(int16_t left, int16_t right)

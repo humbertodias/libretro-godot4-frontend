@@ -1,4 +1,5 @@
 #include "gdretro.h"
+#include "loader.h"
 #include "libretro.h"
 #include <cstdarg> // Required for va_start and va_end
 
@@ -58,6 +59,16 @@ bool GDRetro::core_environment(unsigned cmd, void *data)
         core_log(RETRO_LOG_DEBUG, "[gdretro] Core setting pixel format");
         return GDRetro::get_singleton()->core_video_set_pixel_format(*fmt);
     }
+    break;
+
+    case RETRO_ENVIRONMENT_SET_KEYBOARD_CALLBACK: {
+        // const struct retro_keyboard_callback
+        auto callback = (const struct retro_keyboard_callback *)data;
+        g_retro.retro_keyboard_event_callback = callback->callback;
+        godot::UtilityFunctions::print( "[RetroHost] keyboard callback set" );
+    }
+    break;
+
 
     case RETRO_ENVIRONMENT_GET_SYSTEM_DIRECTORY:
     case RETRO_ENVIRONMENT_GET_SAVE_DIRECTORY:

@@ -19,7 +19,7 @@ static void resize_to_aspect(double ratio, int sw, int sh, int *dw, int *dh) {
 		*dh = *dw / ratio;
 }
 
-void GDRetro::video_configure(const struct retro_game_geometry *geometry)
+void GDRetro::video_init(const struct retro_game_geometry *geometry)
 {
 
 	int nwidth, nheight;
@@ -31,6 +31,10 @@ void GDRetro::video_configure(const struct retro_game_geometry *geometry)
 
     godot::UtilityFunctions::print("[GDRetro] Video init ", nwidth, " x ", nheight, " aspect ratio ", geometry->aspect_ratio);
     this->frame_buffer = godot::Image::create(nwidth, nheight, false, this->pixel_format);
+}
+
+void GDRetro::video_deinit(){
+    // TODO
 }
 
 void GDRetro::core_video_refresh(const void *data, unsigned width, unsigned height, size_t pitch)

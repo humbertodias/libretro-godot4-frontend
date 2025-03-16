@@ -65,7 +65,8 @@ public:
   }
 
   // video
-  void video_configure(const struct retro_game_geometry *geometry);
+  void video_init(const struct retro_game_geometry *geometry);
+  void video_deinit();
   void core_video_refresh(const void *data, unsigned width, unsigned height, size_t pitch);
   bool core_video_set_pixel_format(unsigned format);
 
@@ -78,7 +79,8 @@ public:
   void forwarded_input(const godot::Ref<godot::InputEvent> &event);
 
   // audio
-  void core_audio_init(retro_system_av_info av);
+  void audio_init(double sample_rate);
+  void audio_deinit();
   void core_audio_sample(int16_t left, int16_t right);
   size_t core_audio_sample_batch(const int16_t *data, size_t frames);
 };
