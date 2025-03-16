@@ -14,13 +14,40 @@ jobs:
       with:
         submodules: recursive
 
+    - name: Cache SCons build artifacts
+      uses: actions/cache@v4
+      with:
+        path: .scons_cache
+        key: scons-${{ runner.os }}-${{ hashFiles('SConstruct', 'src/**', 'godot-cpp/**') }}
+        restore-keys: |
+          scons-${{ runner.os }}-
+
+    - name: Cache Godot-cpp
+      uses: actions/cache@v4
+      with:
+        path: godot-cpp/bin
+        key: godotcpp-${{ runner.os }}-${{ hashFiles('godot-cpp/**') }}
+        restore-keys: |
+          godotcpp-${{ runner.os }}-
+
+    - name: Cache Godot export templates
+      uses: actions/cache@v4
+      with:
+        path: ~/.local/share/godot
+        key: godot-templates-${{ runner.os }}-${{ hashFiles('game/export_presets.cfg') }}
+        restore-keys: |
+          godot-templates-${{ runner.os }}-
+
     - name: Set up dependencies
       run: |
         sudo apt update -y && sudo apt install scons
 
-    - name: Compile
+    - name: Compile godot-cpp
       run: |
         (cd godot-cpp && scons)
+    
+    - name: Compile main project
+      run: |
         scons
 
     - name: Set up Godot 4
