@@ -53,8 +53,8 @@ jobs:
     - name: Set up Godot 4
       uses: firebelley/godot-export@v6.0.0
       with:
-        godot_executable_download_url: https://downloads.tuxfamily.org/godotengine/4.4/Godot_v4.4-stable_linux.x86_64.zip
-        godot_export_templates_download_url: https://downloads.tuxfamily.org/godotengine/4.4/Godot_v4.4-stable_export_templates.tpz
+        godot_executable_download_url: https://github.com/godotengine/godot/releases/download/4.4-stable/Godot_v4.4-stable_linux.x86_64.zip
+        godot_export_templates_download_url: https://github.com/godotengine/godot/releases/download/4.4-stable/Godot_v4.4-stable_export_templates.tpz
         export-debug: true
         export-release: true
         use-godot-export-template: true
