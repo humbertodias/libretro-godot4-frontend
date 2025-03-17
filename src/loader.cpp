@@ -69,32 +69,6 @@ static void audio_deinit() {
   GDRetro::get_singleton()->audio_deinit();
 }
 
-static void core_log(enum retro_log_level level, const char *fmt, ...)
-{
-  char buffer[4096] = {0};
-  static const char *levelstr[] = {
-      "dbg",
-      "inf",
-      "wrn",
-      "err"};
-  va_list va;
-
-  va_start(va, fmt);
-  vsnprintf(buffer, sizeof(buffer), fmt, va);
-  va_end(va);
-
-  if (level == 0)
-    return;
-
-  fprintf(stderr, "[%s] %s", levelstr[level], buffer);
-  fflush(stderr);
-
-  if (level == RETRO_LOG_ERROR)
-  {
-    exit(EXIT_FAILURE);
-  }
-}
-
 static bool core_environment(unsigned cmd, void *data)
 {
   return GDRetro::get_singleton()->core_environment(cmd, data);
@@ -268,6 +242,7 @@ void core_unload()
   if (g_retro.initialized)
   {
     g_retro.retro_deinit();
+    g_retro.initialized = false;
   }
 
   if (g_retro.handle)
@@ -284,7 +259,7 @@ void core_unload()
         free((char*)v->value);
     }
     free(g_vars);
-}
+  }
 
   puts("[gdretro] Core unloaded");
 }

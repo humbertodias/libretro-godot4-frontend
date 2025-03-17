@@ -19,10 +19,10 @@ build-godot-cpp:
 	cd godot-cpp && scons
 
 clean-godot-cpp:
-	cd godot-cpp && scons --clean
+	cd godot-cpp && scons -n --clean
 
 clean: clean-godot-cpp
-	scons --clean
+	scons -n --clean
 
 godot-export: build-gdretro
 	mkdir -p $(BUILD_DIR)

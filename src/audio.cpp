@@ -8,6 +8,7 @@
 #include "godot_cpp/classes/scene_tree.hpp"
 #include "godot_cpp/classes/engine.hpp"
 #include "godot_cpp/classes/window.hpp"
+#include "log.h"
 
 using namespace godot;
 
@@ -17,7 +18,7 @@ AudioStreamGeneratorPlayback *audio_playback = nullptr;
 
 void GDRetro::audio_init(double sample_rate)
 {
-    godot::UtilityFunctions::print("[GDRetro] Audio init");
+    core_log(RETRO_LOG_DEBUG, "Audio init");
     audio_stream.instantiate();
     audio_stream->set_mix_rate(sample_rate);
     audio_stream->set_buffer_length(0.1f);
@@ -56,7 +57,15 @@ void GDRetro::audio_init(double sample_rate)
 }
 
 void GDRetro::audio_deinit(){
-    // TODO
+
+    core_log(RETRO_LOG_DEBUG, "Audio deinitializing");
+
+
+    if (audio_callback.set_state) {
+        audio_callback.set_state(false);
+    }
+
+    core_log(RETRO_LOG_DEBUG, "Audio deinitialized");
 }
 
 void GDRetro::core_audio_sample(int16_t left, int16_t right)
@@ -64,7 +73,7 @@ void GDRetro::core_audio_sample(int16_t left, int16_t right)
     if (!audio_playback)
         return;
 
-    godot::UtilityFunctions::print("[GDRetro] core_audio_sample: ", left, ", ", right);
+    core_log(RETRO_LOG_DEBUG, "core_audio_sample: ", left, ", ", right);
 
     float left_f = left / 32768.0f;
     float right_f = right / 32768.0f;
