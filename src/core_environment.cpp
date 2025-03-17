@@ -1,6 +1,7 @@
 #include "gdretro.h"
 #include "loader.h"
 #include "libretro.h"
+#include "video.h"
 #include <cstdarg> // Required for va_start and va_end
 
 static void core_log(enum retro_log_level level, const char *fmt, ...)
@@ -59,8 +60,15 @@ bool GDRetro::core_environment(unsigned cmd, void *data)
         core_log(RETRO_LOG_DEBUG, "[gdretro] Core setting pixel format");
         return GDRetro::get_singleton()->core_video_set_pixel_format(*fmt);
     }
-    break;
-
+    case RETRO_ENVIRONMENT_SET_HW_RENDER: {
+        struct retro_hw_render_callback *hw = (struct retro_hw_render_callback*)data;
+        // TODO: implement
+        // hw->get_current_framebuffer = core_get_current_framebuffer;
+        // hw->get_proc_address = (retro_hw_get_proc_address_t)SDL_GL_GetProcAddress;
+        g_video.hw = *hw;
+        return true;
+    }
+    
     case RETRO_ENVIRONMENT_SET_KEYBOARD_CALLBACK: {
         // const struct retro_keyboard_callback
         auto callback = (const struct retro_keyboard_callback *)data;

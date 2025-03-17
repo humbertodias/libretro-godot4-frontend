@@ -1,5 +1,6 @@
 #include "gdretro.h"
 #include "libretro.h"
+#include "video.h"
 #include "godot_cpp/classes/image.hpp"
 #include "godot_cpp/classes/image_texture.hpp"
 #include "godot_cpp/variant/utility_functions.hpp"
