@@ -2,7 +2,9 @@
 #include "loader.h"
 #include "libretro.h"
 #include "video.h"
+#include "core_environment.h"
 #include <cstdarg> // Required for va_start and va_end
+
 
 static void core_log(enum retro_log_level level, const char *fmt, ...)
 {
@@ -34,6 +36,63 @@ bool GDRetro::core_environment(unsigned cmd, void *data)
 {
     switch (cmd)
     {
+    case RETRO_ENVIRONMENT_SET_VARIABLES: {
+        const struct retro_variable *vars = (const struct retro_variable *)data;
+        size_t num_vars = 0;
+
+        for (const struct retro_variable *v = vars; v->key; ++v) {
+            num_vars++;
+        }
+
+        g_vars = (struct retro_variable*)calloc(num_vars + 1, sizeof(*g_vars));
+        for (unsigned i = 0; i < num_vars; ++i) {
+            const struct retro_variable *invar = &vars[i];
+            struct retro_variable *outvar = &g_vars[i];
+
+            const char *semicolon = strchr(invar->value, ';');
+            const char *first_pipe = strchr(invar->value, '|');
+
+            // SDL_assert(semicolon && *semicolon);
+            semicolon++;
+            while (isspace(*semicolon))
+                semicolon++;
+
+            if (first_pipe) {
+                // outvar->value = malloc((first_pipe - semicolon) + 1);
+                outvar->value = (const char*)malloc((first_pipe - semicolon) + 1);
+                memcpy((char*)outvar->value, semicolon, first_pipe - semicolon);
+                ((char*)outvar->value)[first_pipe - semicolon] = '\0';
+            } else {
+                outvar->value = strdup(semicolon);
+            }
+
+            outvar->key = strdup(invar->key);
+            core_log(RETRO_LOG_DEBUG, "[gdretro] Variable ", invar->key, " = ", outvar->value);
+            // SDL_assert(outvar->key && outvar->value);
+        }
+
+        return true;
+    }
+    case RETRO_ENVIRONMENT_GET_VARIABLE: {
+        struct retro_variable *var = (struct retro_variable *)data;
+
+        if (!g_vars)
+            return false;
+
+        for (const struct retro_variable *v = g_vars; v->key; ++v) {
+            if (strcmp(var->key, v->key) == 0) {
+                var->value = v->value;
+                break;
+            }
+        }
+
+        return true;
+    }
+    case RETRO_ENVIRONMENT_GET_VARIABLE_UPDATE: {
+        bool *bval = (bool*)data;
+        *bval = false;
+        return true;
+    }
     case RETRO_ENVIRONMENT_GET_LOG_INTERFACE:
     {
         struct retro_log_callback *cb = (struct retro_log_callback *)data;
