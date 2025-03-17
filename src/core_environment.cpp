@@ -40,7 +40,7 @@ bool GDRetro::core_environment(unsigned cmd, void *data)
             }
 
             outvar->key = strdup(invar->key);
-            core_log(RETRO_LOG_DEBUG, "Variable %s = %s", invar->key, outvar->value);
+            log(RETRO_LOG_DEBUG, "Variable %s = %s", invar->key, outvar->value);
             // SDL_assert(outvar->key && outvar->value);
         }
 
@@ -69,7 +69,8 @@ bool GDRetro::core_environment(unsigned cmd, void *data)
     case RETRO_ENVIRONMENT_GET_LOG_INTERFACE:
     {
         struct retro_log_callback *cb = (struct retro_log_callback *)data;
-        cb->log = core_log;
+        // cb->log = core_log;
+        cb->log = gd_log;
     }
     break;
 
@@ -89,7 +90,7 @@ bool GDRetro::core_environment(unsigned cmd, void *data)
             return false;
         }
 
-        core_log(RETRO_LOG_DEBUG, "Core setting pixel format");
+        log(RETRO_LOG_DEBUG, "Core setting pixel format");
         return GDRetro::get_singleton()->core_video_set_pixel_format(*fmt);
     }
     case RETRO_ENVIRONMENT_SET_HW_RENDER: {
@@ -105,19 +106,19 @@ bool GDRetro::core_environment(unsigned cmd, void *data)
         // const struct retro_keyboard_callback
         auto callback = (const struct retro_keyboard_callback *)data;
         g_retro.retro_keyboard_event_callback = callback->callback;
-        core_log(RETRO_LOG_DEBUG, "keyboard callback set" );
+        log(RETRO_LOG_DEBUG, "keyboard callback set" );
     }
     break;
 
 
     case RETRO_ENVIRONMENT_GET_VFS_INTERFACE: {
         auto vfs_interface = (struct retro_vfs_interface_info *)data;
-        core_log(RETRO_LOG_DEBUG, "Core requested VFS interface" );
+        log(RETRO_LOG_DEBUG, "Core requested VFS interface" );
         if(vfs_interface->required_interface_version > this->vfs.supported_interface_version) {
             godot::UtilityFunctions::printerr( "Core requested VFS interface v%d we only support up to v%d", vfs_interface->required_interface_version, this->vfs.supported_interface_version );
             return false;
         }
-        core_log(RETRO_LOG_DEBUG, "Core requested VFS interface v%d", vfs_interface->required_interface_version);
+        log(RETRO_LOG_DEBUG, "Core requested VFS interface v%d", vfs_interface->required_interface_version);
         vfs_interface->iface = &this->vfs.vfs_interface;
         return true;
     }
@@ -156,7 +157,7 @@ bool GDRetro::core_environment(unsigned cmd, void *data)
     case RETRO_ENVIRONMENT_SET_MESSAGE:
     {
         const struct retro_message *message = (const struct retro_message *)data;
-        core_log(
+        gd_log(
             RETRO_LOG_DEBUG,
             "RETRO_ENVIRONMENT_SET_MESSAGE: %s\n",
             message->msg);
@@ -165,7 +166,7 @@ bool GDRetro::core_environment(unsigned cmd, void *data)
 
     case RETRO_ENVIRONMENT_SHUTDOWN:
     {
-        core_log(RETRO_LOG_DEBUG, "RETRO_ENVIRONMENT_SHUTDOWN");
+        log(RETRO_LOG_DEBUG, "RETRO_ENVIRONMENT_SHUTDOWN");
         break;
     }
 
@@ -181,7 +182,7 @@ bool GDRetro::core_environment(unsigned cmd, void *data)
 
     default:
     {
-        core_log(RETRO_LOG_DEBUG, "Unhandled env #%u", cmd);
+        log(RETRO_LOG_DEBUG, "Unhandled env #%u", cmd);
         return false;
     }
     }

@@ -18,7 +18,7 @@ AudioStreamGeneratorPlayback *audio_playback = nullptr;
 
 void GDRetro::audio_init(double sample_rate)
 {
-    core_log(RETRO_LOG_DEBUG, "Audio init");
+    log(RETRO_LOG_DEBUG, "Audio init");
     audio_stream.instantiate();
     audio_stream->set_mix_rate(sample_rate);
     audio_stream->set_buffer_length(0.1f);
@@ -46,7 +46,7 @@ void GDRetro::audio_init(double sample_rate)
 
     if (!audio_playback)
     {
-        godot::UtilityFunctions::printerr("[GDRetro] Error: Failed to cast playback to AudioStreamGeneratorPlayback.");
+        log(RETRO_LOG_ERROR, "Error: Failed to cast playback to AudioStreamGeneratorPlayback.");
     }
 
     // Let the core know that the audio device has been initialized.
@@ -58,14 +58,14 @@ void GDRetro::audio_init(double sample_rate)
 
 void GDRetro::audio_deinit(){
 
-    core_log(RETRO_LOG_DEBUG, "Audio deinitializing");
+    log(RETRO_LOG_DEBUG, "Audio deinitializing");
 
 
     if (audio_callback.set_state) {
         audio_callback.set_state(false);
     }
 
-    core_log(RETRO_LOG_DEBUG, "Audio deinitialized");
+    log(RETRO_LOG_DEBUG, "Audio deinitialized");
 }
 
 void GDRetro::core_audio_sample(int16_t left, int16_t right)
@@ -73,7 +73,7 @@ void GDRetro::core_audio_sample(int16_t left, int16_t right)
     if (!audio_playback)
         return;
 
-    core_log(RETRO_LOG_DEBUG, "core_audio_sample: ", left, ", ", right);
+    log(RETRO_LOG_DEBUG, "core_audio_sample: ", left, ", ", right);
 
     float left_f = left / 32768.0f;
     float right_f = right / 32768.0f;

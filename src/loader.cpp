@@ -17,6 +17,7 @@
 #include <dlfcn.h>
 #include "libretro.h"
 #include "loader.h"
+#include "log.h"
 #include "core_environment.h"
 #include "gdretro.h"
 
@@ -32,21 +33,6 @@ int height = 0;
   } while (0)
 #define load_retro_sym(S) load_sym(g_retro.S, S)
 
-static void die(const char *fmt, ...)
-{
-  char buffer[4096];
-
-  va_list va;
-  va_start(va, fmt);
-  vsnprintf(buffer, sizeof(buffer), fmt, va);
-  va_end(va);
-
-  fputs(buffer, stderr);
-  fputc('\n', stderr);
-  fflush(stderr);
-
-  exit(EXIT_FAILURE);
-}
 
 static void video_init(const struct retro_game_geometry *geom)
 {

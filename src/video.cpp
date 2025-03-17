@@ -31,14 +31,14 @@ void GDRetro::video_init(const struct retro_game_geometry *geometry)
 	nwidth *= g_scale;
 	nheight *= g_scale;
 
-    core_log(RETRO_LOG_DEBUG, "Video init %d x %d aspect ratio %d", nwidth, nheight, geometry->aspect_ratio);
+    log(RETRO_LOG_DEBUG, "Video init %d x %d aspect ratio %d", nwidth, nheight, geometry->aspect_ratio);
     this->frame_buffer = godot::Image::create(nwidth, nheight, false, this->pixel_format);
 }
 
 void GDRetro::video_deinit(){
-    core_log(RETRO_LOG_DEBUG, "Video deinitializing");
+    log(RETRO_LOG_DEBUG, "Video deinitializing");
     // TODO: Implement
-    core_log(RETRO_LOG_DEBUG, "Video deinitialized");
+    log(RETRO_LOG_DEBUG, "Video deinitialized");
 }
 
 void GDRetro::core_video_refresh(const void *data, unsigned width, unsigned height, size_t pitch)
@@ -51,11 +51,11 @@ void GDRetro::core_video_refresh(const void *data, unsigned width, unsigned heig
     if ((unsigned)frame_buffer->get_width() != width ||
         (unsigned)frame_buffer->get_height() != height)
     {
-        core_log(RETRO_LOG_DEBUG, "Resizing frame buffer to %d x %d", width, height);
+        log(RETRO_LOG_DEBUG, "Resizing frame buffer to %d x %d", width, height);
         auto created_frame_buffer = godot::Image::create(width, height, false, frame_buffer->get_format());
         if (created_frame_buffer.is_null() || !created_frame_buffer.is_valid())
         {
-            core_log(RETRO_LOG_ERROR,"Failed to recreate frame buffer");
+            log(RETRO_LOG_ERROR,"Failed to recreate frame buffer");
             return;
         }
         frame_buffer = created_frame_buffer;
@@ -71,7 +71,7 @@ void GDRetro::core_video_refresh(const void *data, unsigned width, unsigned heig
             bytes_per_pixel = 4;
             break;
         default:
-            core_log(RETRO_LOG_DEBUG, "Unhandled pixel format: %s",frame_buffer->get_format());
+            log(RETRO_LOG_DEBUG, "Unhandled pixel format: %s",frame_buffer->get_format());
             return;
     }
 
@@ -97,15 +97,15 @@ bool GDRetro::core_video_set_pixel_format(unsigned format)
     switch (format)
     {
         case RETRO_PIXEL_FORMAT_0RGB1555:
-            core_log(RETRO_LOG_DEBUG, "Pixel format: 0RGB1555");
+            log(RETRO_LOG_DEBUG, "Pixel format: 0RGB1555");
             this->pixel_format = godot::Image::Format::FORMAT_RGB565;
             return true;
         case RETRO_PIXEL_FORMAT_XRGB8888:
-            core_log(RETRO_LOG_DEBUG, "Pixel format: XRGB8888");
+            log(RETRO_LOG_DEBUG, "Pixel format: XRGB8888");
             this->pixel_format = godot::Image::Format::FORMAT_RGBA8;
             return true;
         case RETRO_PIXEL_FORMAT_RGB565:
-            core_log(RETRO_LOG_DEBUG, "Pixel format: RGB565");
+            log(RETRO_LOG_DEBUG, "Pixel format: RGB565");
             this->pixel_format = godot::Image::Format::FORMAT_RGB565;
             return true;
         default:
