@@ -38,6 +38,16 @@ void GDRetro::video_deinit(){
     // TODO
 }
 
+static uint32_t ARGB1555toBGRA32(uint16_t packed) {
+    uint32_t a = (uint32_t)(packed & 0x8000);
+    uint32_t r = (uint32_t)(packed & 0x7C00);
+    uint32_t g = (uint32_t)(packed & 0x03E0);
+    uint32_t b = (uint32_t)(packed & 0x1F);
+    uint32_t rgb = (r << 9) | (g << 6) | (b << 3);
+    return (a * 0x1FE00) | rgb | ((rgb >> 5) & 0x070707);
+}
+
+
 void GDRetro::core_video_refresh(const void *data, unsigned width, unsigned height, size_t pitch)
 {
     if (!data || frame_buffer.is_null() || !frame_buffer.is_valid())
@@ -66,7 +76,8 @@ void GDRetro::core_video_refresh(const void *data, unsigned width, unsigned heig
             break;
         case godot::Image::FORMAT_RGBA8:
             bytes_per_pixel = 4;
-            break;
+            bytes_per_pixel = 2;
+        break;
         default:
             godot::UtilityFunctions::printerr("[GDRetro] Unhandled pixel format: ",
                                               frame_buffer->get_format());
@@ -80,15 +91,37 @@ void GDRetro::core_video_refresh(const void *data, unsigned width, unsigned heig
     const uint8_t *src = static_cast<const uint8_t *>(data);
     uint8_t *dst = intermediary_buffer.ptrw();
 
-    for (unsigned y = 0; y < height; y++)
-    {
-        memcpy(dst + y * row_size, src + y * pitch, row_size);
-    }
+if(frame_buffer->get_format() == godot::Image::FORMAT_RGBA8) {
 
-    frame_buffer->set_data(width, height, false, frame_buffer->get_format(), intermediary_buffer);
+    for (unsigned y = 0; y < height; y++) {
+        // Process each row of pixels
+        for (unsigned x = 0; x < width; x++) {
+            // Assuming src points to ARGB1555 packed pixels
+            uint16_t packed_pixel = *reinterpret_cast<const uint16_t*>(src + y * pitch + x * sizeof(uint16_t));
+    
+            // Convert ARGB1555 to BGRA32 and store it in destination buffer
+            uint32_t bgra_pixel = ARGB1555toBGRA32(packed_pixel);
+    
+            // Assuming each pixel is 4 bytes (RGBA32)
+            *reinterpret_cast<uint32_t*>(dst + y * row_size + x * sizeof(uint32_t)) = bgra_pixel;
+        }
+
+        frame_buffer->set_data(width, height, false, godot::Image::FORMAT_RGB565, intermediary_buffer);
+
+    }
+} else {
+
+        for (unsigned y = 0; y < height; y++)
+        {
+            memcpy(dst + y * row_size, src + y * pitch, row_size);
+        }
+        frame_buffer->set_data(width, height, false, frame_buffer->get_format(), intermediary_buffer);
+}
+
 
     set_texture(ImageTexture::create_from_image(frame_buffer));
 }
+
 
 bool GDRetro::core_video_set_pixel_format(unsigned format)
 {
