@@ -17,6 +17,7 @@
 #include <dlfcn.h>
 #include "libretro.h"
 #include "loader.h"
+#include "core_environment.h"
 #include "gdretro.h"
 
 int width = 0;
@@ -276,6 +277,14 @@ void core_unload()
 
   audio_deinit();
   video_deinit();
+
+  if (g_vars) {
+    for (const struct retro_variable *v = g_vars; v->key; ++v) {
+        free((char*)v->key);
+        free((char*)v->value);
+    }
+    free(g_vars);
+}
 
   puts("[gdretro] Core unloaded");
 }
